@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap');
+html, body{
+    background-color: #1a1a1a;
+    background-image: url("./src/wal/desert.png");
+    background-size: cover;
+    color: #fff;
+    font-family: "Fira Code", monospace;
+}
+.bartender{
+    display: flex;
+    justify-content: space-between;
+    background-color: #1a1a1a;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.win{
+    position: absolute;
+    border: solid #fff 5px;
+    background-color: #1a1a1a9a;
+    padding: 25px;
+    width: 400px;
+    height: fit-content;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    backdrop-filter: blur(3px);
+    transition: backdrop-filter, background-color 0.4s;
+}
+.win:hover{
+    backdrop-filter: blur(0);
+    background-color: #1a1a1a;
+}
+
+.fira-code {
+  font-family: "Fira Code", monospace;
+  font-optical-sizing: auto;
+  font-weight: 300px;
+  font-style: normal;
+}
