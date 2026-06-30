@@ -9,7 +9,7 @@ async function makeDesktop() {
         if (app.visible || visibility) {
             desktop.insertAdjacentHTML("beforeend", `
         <div class="desktop-icon" ondblclick="exec('${name}')">
-            <img src="/base/system/icons/${app.icon}.png">
+            <img src="/modOS/base/system/icons/${app.icon}.png">
             <span>${name}</span>
         </div>
     `);
