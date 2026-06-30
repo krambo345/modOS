@@ -7,7 +7,7 @@ var zlast = 1
 document.querySelectorAll(".win").forEach(insertFunctions)
 function insertFunctions(win){
   const header = win.querySelector(".winheader")
-  header.innerHTML += `<div class="winl"><img src="/base/system/icons/${win.dataset.windowicon}.png" class="windowicon"></img><span>${win.dataset.windowname}</span></div><div class="winr"><button class="minimwin" onclick="minimwin(this.closest('.win'))"></button><button class="closewin" onclick="closewin(this.closest('.win'))"></button></div>`
+  header.innerHTML += `<div class="winl"><img src="base/system/icons/${win.dataset.windowicon}.png" class="windowicon"></img><span>${win.dataset.windowname}</span></div><div class="winr"><button class="minimwin" onclick="minimwin(this.closest('.win'))"></button><button class="closewin" onclick="closewin(this.closest('.win'))"></button></div>`
 }
 function minimwin(e){
   e.style.display="none"
