@@ -1,6 +1,6 @@
 import { getSHA256Hash } from "boring-webcrypto-sha256";
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics"; const firebaseConfig = {
+import { initializeApp } from "fire/base/app";
+import { getAnalytics } from "fire/base/analytics"; const firebaseConfig = {
 
   apiKey: FIREBASE_API,
 
@@ -21,10 +21,10 @@ const app = initializeApp(firebaseConfig);
 
 const analytics = getAnalytics(app);
 
-import { doc, Firestore, getFirestore, setDoc } from "firebase/firestore";
+import { doc, Firestore, getFirestore, setDoc } from "fire/base/firestore";
 
 // TODO: Replace the following with your app's Firebase project configuration
-// See: https://support.google.com/firebase/answer/7015592
+// See: https://support.google.com/fire/base/answer/7015592
 
 
 
