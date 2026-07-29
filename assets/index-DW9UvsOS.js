@@ -12,7 +12,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         <section class="modos-account__action">
             <label for="account-action">I am</label>
 
-            <select id="account-action">
+            <select class="modos-account__action-selector">
                 <option value="signup">Signing up</option>
                 <option value="login">Logging in</option>
             </select>
@@ -24,9 +24,9 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
             <label for="email">Email</label>
             <input
                 type="email"
-                id="email"
                 autocomplete="email"
                 placeholder="Enter your email"
+                class="modos-account__field-email"
             >
         </div>
 
@@ -34,25 +34,31 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
             <label for="password">Password</label>
             <input
                 type="password"
-                id="password"
                 autocomplete="current-password"
                 placeholder="Enter your password"
+                class="modos-account__field-password"
             >
         </div>
 
-        <button
+        <div class="account-button">
+          <button
             type="button"
             class="account-submit"
-            id="account-submit"
         >
             Submit
         </button>
-
+        <button
+            type="button"
+            class="account-guest"
+        >
+            Guest
+        </button>
+        </div>
+        
         <p>
             or
             <span
                 class="modos-account__link"
-                id="google-signin"
             >
                 continue with Google
             </span>
@@ -60,7 +66,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
 
     </div>
 </div>
-        `;let n=t.querySelector(`.account-submit`),r=t.querySelector(`#google-signin`);n.addEventListener(`click`,async()=>{let n=t.querySelector(`#account-action`).value,r=t.querySelector(`#email`).value,i=t.querySelector(`#password`).value;try{await vv({action:n,email:r,password:i}),e({action:n,email:r,password:i})}catch(e){console.error(`[bootstrap.ts] Account action failed:`,e),await $(`Account error: ${e}`,`error`)}}),r.addEventListener(`click`,async()=>{try{await yv(),e({action:`google`,email:``,password:``})}catch(e){console.error(`[bootstrap.ts] Google sign-in failed:`,e),await $(`Google sign-in error: ${e}`,`error`)}})})}async function Sv(){console.log(`[bootstrap.ts] Booting ${u} ${d}`);let e=document.querySelector(`.manifest`),t=document.querySelector(`.display`);e.style.display=`block`,t.style.display=`none`,e.style.display==`block`&&t.style.display==`none`?(await $(`Manifest initialized`,`success`),await $(`Manifest display: `+e.style.display,`info`),await $(`Display display: `+t.style.display,`info`)):(await $(`Failed to initialize manifest`,`error`),await $(`Manifest display: `+e.style.display,`warning`),await $(`Display display: `+t.style.display,`warning`)),await xv(),await $(`bootstrapping ${u} ${d}`);let n=await Cp.system.sound(`test`);n!=null&&($(n,`error`),$(``,`error`),$(`If you wish to get the full experience of modOS, please fix the problem by enabling the setting for sound in your browser, removing an adblocker, or resolving the external factor.`,`error`));let r=1;for(;r<=5;)await $(`Confirmation ${r}/5`),await Cp.system.sound(`beep`),await bv(1e3),r++;await bv(),await $(`Detecting browser`),await bv();let i=a();function a(){let e=navigator.userAgent;return e.includes(`Firefox`)?`Firefox`:e.includes(`Edge`)?`Edge`:e.includes(`Safari`)?`Safari`:e.includes(`Opera`)||e.includes(`OPR`)?`Opera`:e.includes(`Chrome`)?`Chrome`:`Unknown`}await bv(),i==`Unknown`?(await $(`Failed to detect known browser`,`error`),await $(`Reported browser: `+i,`warning`)):(await $(`Browser detected`,`success`),await $(`Browser: `+i,`info`)),await bv(),await $(`Testing kernel.bino API`);let o=`/cache/`,s=`test.txt`;await bv(),await $(`Making ${o} `+Cp.bino.dir.make(`${o}`),`info`),await bv(),await $(`Writing ${o}${s} `+Cp.bino.file.write(`/cache/test.txt`,`test`),`info`),await $(`Checking ${o}${s} `+Cp.bino.file.check(`/cache/test.txt`),`info`),await bv(),await $(`Reading ${o}${s} `+Cp.bino.file.read(`/cache/test.txt`),`info`),await bv(),await $(`Listing ${o} `+Cp.bino.dir.list(o),`info`),await bv(),await $(`Deleting ${o}${s} `+Cp.bino.file.delete(`/cache/test.txt`),`info`),await bv(),await $(`Deleting ${o} `+Cp.bino.dir.delete(`${o}`),`info`),await $(`If any of the values above show 'false' or any other unexpected value, please make an issue on GitHub. Thank you!`,`warning`),await $(`Building on-memory system structure`),await $(`Making directory ${f}`,`info`),await bv(),Cp.bino.dir.make(f),await $(`Making directory ${p}`,`info`),Cp.bino.dir.make(p),await bv(),await $(`Making directory ${m}`,`info`),Cp.bino.dir.make(m),await bv(),await $(`Making directory ${h}`,`info`),Cp.bino.dir.make(h),await bv(),await $(`Making directory ${g}`,`info`),Cp.bino.dir.make(g),await bv(),await $(`Making directory ${_}`,`info`),Cp.bino.dir.make(_),await bv(),await $(`Making directory ${v}`,`info`),Cp.bino.dir.make(v),await bv(),await $(`Making directory ${y}`,`info`),Cp.bino.dir.make(y),await bv(),await $(`Making directory ${b}`,`info`),Cp.bino.dir.make(b),await bv(),await $(`Making directory ${x}`,`info`),Cp.bino.dir.make(x),await bv(),await $(`Building lib`),await bv();let c=await wp();await $(`lib built `,`success`),await $(`Writing lib.json`),await bv(3e3),Cp.bino.file.write(S,c),await $(`Wrote ${S}`,`success`),await $(`lib.json content: ${Cp.bino.file.read(S)}`,`info`),await bv(2e3),await bv(),await $(`Running terminal`),await $(`Bootstrap complete, welcome to ${u} ${d}!`,`success`),Cp.system.sound(`tada`),await bv(5e3),e.innerHTML=``,e.style.display=`none`,t.style.display=`block`,e.style.display==`none`&&t.style.display==`block`?(await $(`Toggled to display`,`success`),await $(`Manifest display: `+e.style.display,`info`),await $(`Display display: `+t.style.display,`info`)):(await $(`Failed to toggle to display`,`error`),await $(`Manifest display: `+e.style.display,`warning`),await $(`Display display: `+t.style.display,`warning`))}document.querySelector(`#app`).innerHTML=`
+        `;let n=t.querySelector(`.account-submit`),r=t.querySelector(`.account-guest`),i=t.querySelector(`.modos-account__link`);n.addEventListener(`click`,async()=>{let n=t.querySelector(`.modos-account__action-selector`).value,r=t.querySelector(`.modos-account__field-email`).value,i=t.querySelector(`.modos-account__field-password`).value;try{await vv({action:n,email:r,password:i}),e({action:n,email:r,password:i})}catch(e){console.error(`[bootstrap.ts] Account action failed:`,e),await $(`Account error: ${e}`,`error`)}}),r.addEventListener(`click`,async()=>{e({action:`guest`})}),i.addEventListener(`click`,async()=>{try{await yv(),e({action:`google`,email:``,password:``})}catch(e){console.error(`[bootstrap.ts] Google sign-in failed:`,e),await $(`Google sign-in error: ${e}`,`error`)}})})}async function Sv(){console.log(`[bootstrap.ts] Booting ${u} ${d}`);let e=document.querySelector(`.manifest`),t=document.querySelector(`.display`);e.style.display=`block`,t.style.display=`none`,e.style.display==`block`&&t.style.display==`none`?(await $(`Manifest initialized`,`success`),await $(`Manifest display: `+e.style.display,`info`),await $(`Display display: `+t.style.display,`info`)):(await $(`Failed to initialize manifest`,`error`),await $(`Manifest display: `+e.style.display,`warning`),await $(`Display display: `+t.style.display,`warning`)),await xv(),await $(`bootstrapping ${u} ${d}`);let n=await Cp.system.sound(`test`);n!=null&&($(n,`error`),$(``,`error`),$(`If you wish to get the full experience of modOS, please fix the problem by enabling the setting for sound in your browser, removing an adblocker, or resolving the external factor.`,`error`));let r=1;for(;r<=5;)await $(`Confirmation ${r}/5`),await Cp.system.sound(`beep`),r++;await $(`Detecting browser`);let i=a();function a(){let e=navigator.userAgent;return e.includes(`Firefox`)?`Firefox`:e.includes(`Edge`)?`Edge`:e.includes(`Safari`)?`Safari`:e.includes(`Opera`)||e.includes(`OPR`)?`Opera`:e.includes(`Chrome`)?`Chrome`:`Unknown`}i==`Unknown`?(await $(`Failed to detect known browser`,`error`),await $(`Reported browser: `+i,`warning`)):(await $(`Browser detected`,`success`),await $(`Browser: `+i,`info`)),await $(`Testing kernel.bino API`);let o=`/cache/`,s=`test.txt`;await $(`Making ${o} `+Cp.bino.dir.make(`${o}`),`info`),await $(`Writing ${o}${s} `+Cp.bino.file.write(`/cache/test.txt`,`test`),`info`),await $(`Checking ${o}${s} `+Cp.bino.file.check(`/cache/test.txt`),`info`),await $(`Reading ${o}${s} `+Cp.bino.file.read(`/cache/test.txt`),`info`),await $(`Listing ${o} `+Cp.bino.dir.list(o),`info`),await $(`Deleting ${o}${s} `+Cp.bino.file.delete(`/cache/test.txt`),`info`),await $(`Deleting ${o} `+Cp.bino.dir.delete(`${o}`),`info`),await $(`If any of the values above show 'false' or any other unexpected value, please make an issue on GitHub. Thank you!`,`warning`),await $(`Building on-memory system structure`),await $(`Making directory ${f}`,`info`),Cp.bino.dir.make(f),await $(`Making directory ${p}`,`info`),Cp.bino.dir.make(p),await $(`Making directory ${m}`,`info`),Cp.bino.dir.make(m),await $(`Making directory ${h}`,`info`),Cp.bino.dir.make(h),await $(`Making directory ${g}`,`info`),Cp.bino.dir.make(g),await $(`Making directory ${_}`,`info`),Cp.bino.dir.make(_),await $(`Making directory ${v}`,`info`),Cp.bino.dir.make(v),await $(`Making directory ${y}`,`info`),Cp.bino.dir.make(y),await $(`Making directory ${b}`,`info`),Cp.bino.dir.make(b),await $(`Making directory ${x}`,`info`),Cp.bino.dir.make(x),await $(`Building lib`);let c=await wp();await $(`lib built `,`success`),await $(`Writing lib.json`),Cp.bino.file.write(S,c),await $(`Wrote ${S}`,`success`),await $(`lib.json content: ${Cp.bino.file.read(S)}`,`info`),await $(`Running terminal`),await $(`Bootstrap complete, welcome to ${u} ${d}!`,`success`),Cp.system.sound(`tada`),await bv(2e3),e.innerHTML=``,e.style.display=`none`,t.style.display=`block`,e.style.display==`none`&&t.style.display==`block`?(await $(`Toggled to display`,`success`),await $(`Manifest display: `+e.style.display,`info`),await $(`Display display: `+t.style.display,`info`)):(await $(`Failed to toggle to display`,`error`),await $(`Manifest display: `+e.style.display,`warning`),await $(`Display display: `+t.style.display,`warning`))}document.querySelector(`#app`).innerHTML=`
   <div class="manifest"></div>
   <div class="display">
     <div class="bartender"></div>
