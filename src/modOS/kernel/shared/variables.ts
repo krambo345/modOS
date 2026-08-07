@@ -1,0 +1,14 @@
+export const osName = "modOS Sevda Çiçeği";
+export const osVersion = "v0.1.4-beta";
+export const structureCache = "/cache/";
+export const structurePackages = "/packages/";
+export const structurePackagesTerminal = "/packages/terminal/";
+export const structurePackagesFileManager = "/packages/filemanager/";
+export const structurePackagesWindowManager = "/packages/windowmanager/";
+export const structurePackagesDesktop = "/packages/desktop/";
+export const structurePackagesBar = "/packages/bar/";
+export const structureUsr = "/usr/";
+export const structureUsrDocuments = "/usr/documents/";
+export const structureUsrMedia = "/usr/media/";
+export const libJSONloc = "/cache/lib.json";
+export const sysPackages = ["com.krambo345.windowmanager"];

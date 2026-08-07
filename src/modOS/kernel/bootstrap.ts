@@ -1,0 +1,63 @@
+import * as variables from "@kernel/shared/variables";
+import { kernel } from "@kernel/api";
+import { bootstrapDisplayToggle } from "@kernel/bootstrap/display";
+import { bootstrapAccountForm } from "@kernel/bootstrap/accountForm";
+import { bootstrapBrowserDetect } from "@kernel/bootstrap/browser";
+import { bootstrapBinoTest } from "@kernel/bootstrap/binoTest";
+import { bootstrapStructureBuild } from "@kernel/bootstrap/structure";
+import { bootstrapLibBuild } from "@kernel/bootstrap/lib";
+import { bootstrapAppsLaunch } from "@kernel/bootstrap/apps";
+
+export async function bootstrap() {
+  await kernel.system.log(`Booting ${variables.osName} ${variables.osVersion}`);
+  const manifest = document.querySelector<HTMLDivElement>(".manifest")!;
+  const display = document.querySelector<HTMLDivElement>(".display")!;
+
+  await bootstrapDisplayToggle(manifest, display, "manifest");
+
+  await bootstrapAccountForm();
+  if (!(await kernel.account.ensureUserData())) {
+    await kernel.system.log("Failed to retrieve or create user data.", "error");
+  } else {
+    await kernel.system.log("Successfully signed in", "success");
+  }
+
+  await kernel.system.log(`bootstrapping ${variables.osName} ${variables.osVersion}`);
+  const check = await kernel.system.sound("test");
+  if (check != undefined) {
+    await kernel.system.log(check, "error");
+    await kernel.system.log("", "error");
+    await kernel.system.log(
+      "If you wish to get the full experience of modOS, please fix the problem by enabling the setting for sound in your browser, removing an adblocker, or resolving the external factor.",
+      "error",
+    );
+  }
+  let i = 1;
+  while (i <= 5) {
+    await kernel.system.log(`Confirmation ${i}/5`);
+    await kernel.system.sound("beep");
+    i++;
+  }
+
+  await kernel.system.log("Detecting browser");
+  const browser = bootstrapBrowserDetect();
+  if (browser != "Unknown") {
+    await kernel.system.log("Browser detected", "success");
+    await kernel.system.log("Browser: " + browser, "info");
+  } else {
+    await kernel.system.log("Failed to detect known browser", "error");
+    await kernel.system.log("Reported browser: " + browser, "warning");
+  }
+
+  await bootstrapBinoTest();
+  await bootstrapStructureBuild();
+  await bootstrapLibBuild();
+  await bootstrapAppsLaunch();
+  await kernel.system.log(
+    `Bootstrap complete, welcome to ${variables.osName} ${variables.osVersion}!`,
+    "success",
+  );
+  await kernel.system.delay(2000);
+
+  await bootstrapDisplayToggle(manifest, display, "display", false);
+}
