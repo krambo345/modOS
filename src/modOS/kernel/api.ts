@@ -1,11 +1,11 @@
 import type { messageType } from "@kernel/shared/types";
+import * as variables from "@kernel/shared/variables";
 import * as bino from "@kernel/bino";
 import * as packer from "@kernel/packer";
 import * as system from "@kernel/system";
 import * as auth from "@kernel/firebase/auth";
 import { firestoreUserData } from "@kernel/firebase/firestore";
 import * as terminal from "@kernel/terminal";
-import * as variables from "@kernel/shared/variables"
 
 export const kernel = {
   base: import.meta.env.BASE_URL,
@@ -115,7 +115,7 @@ export const kernel = {
     async get(pckg: string) {
       return await packer.packageInstall(pckg);
     },
-    async remove(pckg: string) {
+    remove(pckg: string) {
       return packer.packageUninstall(pckg);
     },
     async start(pckg: string) {
@@ -129,7 +129,13 @@ export const kernel = {
     async launch(element: HTMLElement) {
       await terminal.launch(element);
     },
+    async kill() {
+      await terminal.kill();
+    },
   },
 };
 
-(globalThis as unknown as { modOS: { kernel: typeof kernel; variables: typeof variables } }).modOS = { kernel, variables };
+(globalThis as unknown as { modOS: { kernel: typeof kernel; variables: typeof variables } }).modOS = {
+  kernel,
+  variables,
+};
