@@ -1,5 +1,5 @@
 export const osName = "modOS Sevda Çiçeği";
-export const osVersion = "v0.1.4-beta";
+export const osVersion = "v1.0.0-beta";
 export const structureCache = "/cache/";
 export const structurePackages = "/packages/"
 export const structureUsr = "/usr/";
