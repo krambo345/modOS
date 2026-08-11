@@ -7,11 +7,6 @@ export async function bootstrapStructureBuild() {
   const directories = [
     variables.structureCache,
     variables.structurePackages,
-    variables.structurePackagesTerminal,
-    variables.structurePackagesFileManager,
-    variables.structurePackagesWindowManager,
-    variables.structurePackagesDesktop,
-    variables.structurePackagesBar,
     variables.structureUsr,
     variables.structureUsrDocuments,
     variables.structureUsrMedia,

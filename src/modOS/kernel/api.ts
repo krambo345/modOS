@@ -1,12 +1,14 @@
 import type { messageType } from "@kernel/shared/types";
 import * as bino from "@kernel/bino";
-import * as apps from "@kernel/apps";
+import * as packer from "@kernel/packer";
 import * as system from "@kernel/system";
 import * as auth from "@kernel/firebase/auth";
 import { firestoreUserData } from "@kernel/firebase/firestore";
 import * as terminal from "@kernel/terminal";
+import * as variables from "@kernel/shared/variables"
 
 export const kernel = {
+  base: import.meta.env.BASE_URL,
   system: {
     async sound(sound: string, times?: number) {
       return await system.systemSound(sound, times);
@@ -21,11 +23,20 @@ export const kernel = {
   bino: {
     file: {
       write(path: string, data: string) {
+        if (path == undefined) {
+          return String("Path not specified")
+        }
+        if (data == undefined) {
+          return String("Data not specified")
+        }
         if (bino.binoWrite(path, data)) {
           return true;
         }
       },
       read(path: string) {
+        if (path == undefined) {
+          return String("Path not specified")
+        }
         if (bino.binoCheck(path)) {
           return bino.binoRead(path);
         }
@@ -34,6 +45,9 @@ export const kernel = {
         return bino.binoCheck(path);
       },
       delete(path: string) {
+        if (path == undefined) {
+          return String("Path not specified")
+        }
         if (bino.binoCheck(path)) {
           bino.binoDelete(path);
           return true;
@@ -44,15 +58,30 @@ export const kernel = {
     },
     dir: {
       make(path: string) {
+        if (path == undefined) {
+          return String("Path not specified")
+        }
         bino.binoDirWrite(path);
         return true;
       },
-      list(path: string) {
-        if (bino.binoCheck(path)) {
-          return bino.binoDirContents(path);
+      list(
+        path: string,
+        options?: Parameters<typeof bino.binoDirContents>[1]
+      ): ReturnType<typeof bino.binoDirContents> | string {
+        if (path == undefined) {
+          return String("Path not specified");
         }
+
+        if (bino.binoCheck(path)) {
+          return bino.binoDirContents(path, options);
+        }
+
+        return String("Path not found");
       },
       delete(path: string) {
+        if (path == undefined) {
+          return String("Path not specified")
+        }
         if (bino.binoCheck(path)) {
           bino.binoDirDelete(path);
           return true;
@@ -76,28 +105,24 @@ export const kernel = {
       return await firestoreUserData();
     },
   },
-  // Single surface for everything package/app related: browse (list), cache
-  // locally (install/uninstall), and run (launch/kill). launch() installs
-  // automatically the first time a package is used, then always runs from
-  // the local bino cache afterwards.
-  apps: {
-    async list(col?: string) {
-      return await apps.appsList(col);
+  packer: {
+    async fetch() {
+      return await packer.packageList();
     },
-    isInstalled(pckg: string) {
-      return apps.appsIsInstalled(pckg);
+    check(pckg: string) {
+      return packer.packageIsInstalled(pckg);
     },
-    async install(pckg: string) {
-      return await apps.appsInstall(pckg);
+    async get(pckg: string) {
+      return await packer.packageInstall(pckg);
     },
-    uninstall(pckg: string) {
-      return apps.appsUninstall(pckg);
+    async remove(pckg: string) {
+      return packer.packageUninstall(pckg);
     },
-    async launch(pckg: string) {
-      return await apps.appsLaunch(pckg);
+    async start(pckg: string) {
+      return await packer.packageLaunch(pckg);
     },
-    async kill(pckg: string) {
-      return await apps.appsKill(pckg);
+    async stop(pckg: string) {
+      return await packer.packageKill(pckg);
     },
   },
   terminal: {
@@ -107,4 +132,4 @@ export const kernel = {
   },
 };
 
-(globalThis as unknown as { modOS: { kernel: typeof kernel } }).modOS = { kernel };
+(globalThis as unknown as { modOS: { kernel: typeof kernel; variables: typeof variables } }).modOS = { kernel, variables };

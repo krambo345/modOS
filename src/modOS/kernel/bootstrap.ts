@@ -6,16 +6,15 @@ import { bootstrapBrowserDetect } from "@kernel/bootstrap/browser";
 import { bootstrapBinoTest } from "@kernel/bootstrap/binoTest";
 import { bootstrapStructureBuild } from "@kernel/bootstrap/structure";
 import { bootstrapLibBuild } from "@kernel/bootstrap/lib";
-import { bootstrapAppsLaunch } from "@kernel/bootstrap/apps";
+import { bootstrapPackageGet, bootstrapPackageLaunch } from "@kernel/bootstrap/packer";
 
 export async function bootstrap() {
-  await kernel.system.log(`Booting ${variables.osName} ${variables.osVersion}`);
   const manifest = document.querySelector<HTMLDivElement>(".manifest")!;
   const display = document.querySelector<HTMLDivElement>(".display")!;
-
+  try{
+  await kernel.system.log(`Booting ${variables.osName} ${variables.osVersion}`);
   await bootstrapDisplayToggle(manifest, display, "manifest");
-
-  await bootstrapAccountForm();
+    await bootstrapAccountForm();
   if (!(await kernel.account.ensureUserData())) {
     await kernel.system.log("Failed to retrieve or create user data.", "error");
   } else {
@@ -32,27 +31,25 @@ export async function bootstrap() {
       "error",
     );
   }
-  let i = 1;
-  while (i <= 5) {
-    await kernel.system.log(`Confirmation ${i}/5`);
-    await kernel.system.sound("beep");
-    i++;
-  }
-
   await kernel.system.log("Detecting browser");
-  const browser = bootstrapBrowserDetect();
-  if (browser != "Unknown") {
-    await kernel.system.log("Browser detected", "success");
-    await kernel.system.log("Browser: " + browser, "info");
-  } else {
-    await kernel.system.log("Failed to detect known browser", "error");
-    await kernel.system.log("Reported browser: " + browser, "warning");
-  }
-
-  await bootstrapBinoTest();
-  await bootstrapStructureBuild();
-  await bootstrapLibBuild();
-  await bootstrapAppsLaunch();
+    const browser = bootstrapBrowserDetect();
+    if (browser != "Unknown") {
+      await kernel.system.log("Browser detected", "success");
+      await kernel.system.log("Browser: " + browser, "info");
+    } else {
+      await kernel.system.log("Failed to detect known browser", "error");
+      await kernel.system.log("Reported browser: " + browser, "warn");
+    }
+    await bootstrapBinoTest();
+    await bootstrapStructureBuild();
+    await bootstrapLibBuild();
+    await bootstrapPackageGet();
+    await bootstrapPackageLaunch();
+}
+catch(error){
+  kernel.system.log(error, "error")
+  return false
+}
   await kernel.system.log(
     `Bootstrap complete, welcome to ${variables.osName} ${variables.osVersion}!`,
     "success",
@@ -60,4 +57,5 @@ export async function bootstrap() {
   await kernel.system.delay(2000);
 
   await bootstrapDisplayToggle(manifest, display, "display", false);
+    return false;
 }

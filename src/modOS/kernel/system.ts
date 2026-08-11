@@ -28,18 +28,30 @@ export async function systemLog(message: unknown, type?: messageType) {
   const manifest = document.querySelector<HTMLDivElement>(".manifest")!;
   const colors: Record<messageType, string> = {
     error: "#f00",
-    warning: "#ff0",
+    warn: "#ff0",
     info: "#0ff",
     success: "#0f0",
-    norm: "#fff",
+    log: "#fff",
   };
+
+  const consoleMethods: Record<messageType, keyof Console> = {
+    error: "error",
+    warn: "warn",
+    info: "info",
+    success: "log",
+    log: "log",
+  };
+
+  const logType = type ?? "log";
+
+  eval(`console.${consoleMethods[logType] ?? "log"}(message)`)
 
   manifest.insertAdjacentHTML(
     "beforeend",
-    `<p style="color:${colors[type ?? "norm"]}">${message}</p>`,
+    `<p style="color:${colors[logType]}">${message}</p>`,
   );
   manifest.scrollTop = manifest.scrollHeight;
-  if (type == "warning") {
+  if (type == "warn") {
     await systemSound("beep");
   }
   if (type == "error") {

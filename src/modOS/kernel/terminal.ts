@@ -2,16 +2,35 @@ import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 import { kernel } from "@kernel/api";
+import { packageCommands } from "./packer";
+import * as types from "@kernel/shared/types";
 
 let terminalInstance: Terminal | null = null;
 let terminalFitAddon: FitAddon | null = null;
-let terminalResizeObserver: ResizeObserver | null = null;
+let terminalResizeHandler: (() => void) | null = null;
 let terminalLine = "";
+
+let writeBuffer: string[] = [];
+let writeAnimationFrame: number | null = null;
+function bufferedWrite(data: string) {
+  if (!terminalInstance) return;
+  writeBuffer.push(data);
+
+  if (!writeAnimationFrame) {
+    writeAnimationFrame = requestAnimationFrame(() => {
+      if (terminalInstance && writeBuffer.length > 0) {
+        terminalInstance.write(writeBuffer.join(""));
+        writeBuffer = [];
+      }
+      writeAnimationFrame = null;
+    });
+  }
+}
 
 async function terminalKernelRun(args: string[]) {
   const [path, ...rest] = args;
   if (!path) {
-    terminalInstance!.write("\r\nusage: kernel <dotted.path> [...args]");
+    bufferedWrite("\r\nusage: kernel <dotted.path> [...args]");
     return;
   }
   const parts = path.split(".");
@@ -22,96 +41,274 @@ async function terminalKernelRun(args: string[]) {
   }
   const fn = (target as Record<string, unknown> | undefined)?.[methodName];
   if (typeof fn !== "function") {
-    terminalInstance!.write(`\r\nunknown kernel path: ${path}`);
+    bufferedWrite(`\r\nunknown kernel path: ${path}`);
     return;
   }
   try {
     const result = await (fn as (...a: unknown[]) => unknown).apply(target, rest);
-    terminalInstance!.write(`\r\n${JSON.stringify(result ?? null)}`);
+    bufferedWrite(`\r\n${JSON.stringify(result ?? null)}`);
   } catch (err) {
-    terminalInstance!.write(`\r\nkernel error: ${err}`);
+    bufferedWrite(`\r\nkernel error: ${err}`);
   }
 }
 
 async function terminalPrint(result: unknown) {
-  terminalInstance!.write(`\r\n${JSON.stringify(result ?? null)}`);
-}
-
-const terminalCommands: Record<string, (args: string[]) => void | Promise<void>> = {
-  help: () =>
-    terminalInstance!.write(
-      "\r\navailable: help, clear, ls, cat, write, rm, mkdir, install, uninstall, launch, kill, whoami, kernel <dotted.path> [...args]",
-    ),
-  clear: () => terminalInstance!.write("\x1b[2J\x1b[3J\x1b[H"),
-  kernel: (args) => terminalKernelRun(args),
-  ls: async ([path]) => terminalPrint(kernel.bino.dir.list(path)),
-  cat: async ([path]) => terminalPrint(kernel.bino.file.read(path)),
-  write: async ([path, ...data]) =>
-    terminalPrint(await kernel.bino.file.write(path, data.join(" "))),
-  rm: async ([path]) => terminalPrint(kernel.bino.file.delete(path)),
-  mkdir: async ([path]) => terminalPrint(kernel.bino.dir.make(path)),
-  install: async ([pckg]) => terminalPrint(await kernel.apps.install(pckg)),
-  uninstall: async ([pckg]) => terminalPrint(kernel.apps.uninstall(pckg)),
-  launch: async ([pckg]) => terminalPrint(await kernel.apps.launch(pckg)),
-  kill: async ([pckg]) => terminalPrint(await kernel.apps.kill(pckg)),
-  whoami: async () => terminalPrint(await kernel.account.sessionUID()),
-};
-
-function terminalPrompt() {
-  terminalInstance!.write("\r\n");
-}
-
-async function terminalRun(line: string) {
-  const [name, ...args] = line.trim().split(" ");
-  const command = terminalCommands[name];
-  if (command) {
-    await command(args);
-  } else if (name) {
-    terminalInstance!.write(`\r\nunknown command: ${name}`);
+  if (!terminalInstance) return;
+  if (typeof result === "string") {
+    bufferedWrite(`\r\n${result}`);
+  } else if (result !== undefined) {
+    bufferedWrite(`\r\n${JSON.stringify(result ?? null)}`);
   }
 }
 
+const terminalCommands: Record<string, types.terminalCommand> = {
+  help: {
+    args: "",
+    description: "Show available commands",
+    run: () => man(),
+  },
+
+  clear: {
+    args: "",
+    description: "Clear the terminal",
+    run: () => {
+      writeBuffer = [];
+      terminalInstance?.write("\x1b[2J\x1b[3J\x1b[H");
+    },
+  },
+
+  kernel: {
+    args: "<command>",
+    description: "Run a kernel command",
+    run: (args) => terminalKernelRun(args),
+  },
+
+  ls: {
+    args: "[path]",
+    description: "List directory contents",
+    run: async ([path]) => terminalPrint(kernel.bino.dir.list(path)),
+  },
+
+  cat: {
+    args: "<path>",
+    description: "Read a file",
+    run: async ([path]) => terminalPrint(kernel.bino.file.read(path)),
+  },
+
+  touch: {
+    args: "<path> [data...]",
+    description: "Create or write to a file",
+    run: async ([path, ...data]) =>
+      terminalPrint(kernel.bino.file.write(path, data.join(" "))),
+  },
+
+  rm: {
+    args: "<path>",
+    description: "Delete a file",
+    run: async ([path]) => terminalPrint(kernel.bino.file.delete(path)),
+  },
+
+  mkdir: {
+    args: "<path>",
+    description: "Create a directory",
+    run: async ([path]) => terminalPrint(kernel.bino.dir.make(path)),
+  },
+
+  packer: {
+    args: "<arg>",
+    description: "Manage packages",
+    sub: {
+      get: {
+        args: "<package>",
+        description: "Get a package",
+        run: async ([pckg]) => terminalPrint(await kernel.packer.get(pckg)),
+      },
+      remove: {
+        args: "<package>",
+        description: "Remove a package",
+        run: async ([pckg]) => terminalPrint(await kernel.packer.remove(pckg)),
+      },
+      start: {
+        args: "<package>",
+        description: "Start a package",
+        run: async ([pckg]) => terminalPrint(await kernel.packer.start(pckg)),
+      },
+      stop: {
+        args: "<package>",
+        description: "Stop a package",
+        run: async ([pckg]) => terminalPrint(await kernel.packer.stop(pckg)),
+      },
+      fetch: {
+        args: "",
+        description: "Fetch package database",
+        run: async () => terminalPrint(await kernel.packer.fetch()),
+      },
+      check: {
+        args: "<package>",
+        description: "Check if a package exists",
+        run: async ([pckg]) => terminalPrint(kernel.packer.check(pckg)),
+      },
+    },
+  },
+
+  whoami: {
+    args: "",
+    description: "Show the current user",
+    run: async () => terminalPrint(await kernel.account.sessionUID()),
+  },
+};
+
+async function getActiveCommands(): Promise<Record<string, types.terminalCommand>> {
+  const dynamicCommands = await packageCommands();
+  return {
+    ...terminalCommands,
+    ...dynamicCommands,
+  };
+}
+
+async function man() {
+  if (!terminalInstance) return;
+  const activeCommands = await getActiveCommands();
+  const entries = Object.entries(activeCommands);
+
+  const nameWidth = Math.max(...entries.map(([name]) => name.length));
+  const argsWidth = Math.max(
+    ...entries.map(([, command]) => command.args?.length || 0)
+  );
+
+  const lines = entries.map(([name, command]) => {
+    const paddedName = name.padEnd(nameWidth);
+    const paddedArgs = (command.args || "").padEnd(argsWidth);
+
+    return ` ${paddedName}  ${paddedArgs}  ${command.description || ""}`;
+  });
+
+  bufferedWrite(
+    `\r\n Available Commands:\r\n${lines.join("\r\n")}\r\n`
+  );
+}
+
+async function terminalRun(line: string) {
+  if (!terminalInstance) return;
+  const trimmed = line.trim();
+
+  if (!trimmed) {
+    return;
+  }
+
+  const tokens = trimmed.split(/\s+/);
+
+  let commandMap = await getActiveCommands();
+  let command: types.terminalCommand | undefined;
+  let i = 0;
+
+  while (i < tokens.length) {
+    command = commandMap[tokens[i]];
+
+    if (!command) {
+      bufferedWrite(
+        `\r\nunknown command: ${tokens.slice(0, i + 1).join(" ")}`
+      );
+      return;
+    }
+
+    i++;
+
+    if (command.sub) {
+      commandMap = command.sub;
+      continue;
+    }
+
+    break;
+  }
+
+  if (!command || !command.run) {
+    bufferedWrite(`\r\nincomplete command — try 'help'`);
+    return;
+  }
+
+  const args = tokens.slice(i);
+
+  try {
+    const result = await command.run(args);
+
+    if (result !== undefined) {
+      await terminalPrint(result);
+    }
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : String(error);
+
+    bufferedWrite(`\r\nerror: ${message}`);
+  }
+}
+
+function terminalPrompt() {
+  bufferedWrite("\r\n> ");
+}
+
 function terminalInput(data: string) {
+  if (!terminalInstance) return;
   if (data === "\r") {
     terminalRun(terminalLine).then(() => {
       terminalLine = "";
       terminalPrompt();
     });
   } else if (data === "\u007F") {
-    terminalLine = terminalLine.slice(0, -1);
-    terminalInstance!.write("\b \b");
+    if (terminalLine.length > 0) {
+      terminalLine = terminalLine.slice(0, -1);
+      bufferedWrite("\b \b");
+    }
   } else {
     terminalLine += data;
-    terminalInstance!.write(data);
+    bufferedWrite(data);
   }
 }
 
 export async function launch(element: HTMLElement) {
+  await kill();
+
   terminalInstance = new Terminal();
   terminalFitAddon = new FitAddon();
+
   terminalInstance.loadAddon(terminalFitAddon);
   terminalInstance.open(element);
-  terminalFitAddon.fit();
+  try {
+    terminalFitAddon.fit();
+  } catch {}
 
-  terminalResizeObserver = new ResizeObserver(() => terminalFitAddon!.fit());
-  terminalResizeObserver.observe(element);
+  terminalResizeHandler = () => {
+    try {
+      terminalFitAddon?.fit();
+    } catch {}
+  };
 
-  terminalInstance.write("modOS terminal");
+  window.addEventListener("resize", terminalResizeHandler);
+
+  bufferedWrite(
+    "\r\nmodOS Terminal. \r\n enter 'help' to see a list of commands"
+  );
+
   terminalPrompt();
   terminalInstance.onData(terminalInput);
 
   return true;
 }
-
 export async function kill() {
-  if (terminalResizeObserver) {
-    terminalResizeObserver.disconnect();
-    terminalResizeObserver = null;
+  if (writeAnimationFrame) {
+    cancelAnimationFrame(writeAnimationFrame);
+    writeAnimationFrame = null;
+  }
+  writeBuffer = [];
+  if (terminalResizeHandler) {
+    window.removeEventListener("resize", terminalResizeHandler);
+    terminalResizeHandler = null;
   }
   if (terminalInstance) {
     terminalInstance.dispose();
     terminalInstance = null;
   }
   terminalFitAddon = null;
+  terminalLine = "";
   return true;
 }

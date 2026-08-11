@@ -10,7 +10,7 @@ const db = getFirestore(app);
 export async function firestorePackagesGet(col: string) {
   const libCollection = collection(db, col);
   const snapshot = await getDocs(libCollection);
-  return snapshot.docs.map((entry) => entry.data());
+  return snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
 }
 
 export async function firestorePackageInstall(pckg: string) {

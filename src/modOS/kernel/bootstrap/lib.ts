@@ -4,7 +4,7 @@ import * as variables from "@kernel/shared/variables";
 export async function bootstrapLibBuild() {
   await kernel.system.log("Building lib");
 
-  const lib = JSON.stringify(await kernel.apps.list("lib"));
+  const lib = JSON.stringify(await kernel.packer.fetch());
   await kernel.system.log("lib built ", "success");
   await kernel.system.log("Writing lib.json");
   kernel.bino.file.write(variables.libJSONloc, lib);

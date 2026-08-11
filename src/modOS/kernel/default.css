@@ -10,11 +10,10 @@
     --cursor-not-allowed: url("/media/cursor/Unavailable.cur"), not-allowed;
 }
 * {
-  background-color: #000;
-  color: #fff;
   font-family: "Fira Code", monospace;
 }
 html, body{
+  background-color: #000;
   margin: 0;
   padding: 0;
   height: 100%;
@@ -43,9 +42,13 @@ textarea {
   cursor: none;
   user-select: none;
 }
+.display {
+  width: 100vw;
+  height: 100vh;
+}
 .modos-account {
     width: 100%;
-
+    color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -78,6 +81,8 @@ textarea {
 .modos-account__action select{
   border: 2px solid #fff;
   border-radius: 30px;
+  background-color: #000;
+  color: #fff;
 }
 .modos-account__action select:hover{
   cursor: var(--cursor-pointer);
@@ -118,6 +123,8 @@ textarea {
   margin-right: 20%;
 }
 .account-button button{
+  color: #fff;
+  background-color: #000;
   width: 120px;
   height: 40px;
   border-radius: 30px;

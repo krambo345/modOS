@@ -22,7 +22,7 @@ export async function bootstrapDisplayToggle(
     await kernel.system.log("Display display: " + display.style.display, "info");
   } else {
     await kernel.system.log(`Failed to toggle to ${target}`, "error");
-    await kernel.system.log("Manifest display: " + manifest.style.display, "warning");
-    await kernel.system.log("Display display: " + display.style.display, "warning");
+    await kernel.system.log("Manifest display: " + manifest.style.display, "warn");
+    await kernel.system.log("Display display: " + display.style.display, "warn");
   }
 }

@@ -44,6 +44,6 @@ export async function bootstrapBinoTest() {
   );
   await kernel.system.log(
     "If any of the values above show 'false' or any other unexpected value, please make an issue on GitHub. Thank you!",
-    "warning",
+    "warn",
   );
 }

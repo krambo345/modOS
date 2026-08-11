@@ -18,8 +18,11 @@ export function binoDirWrite(path:string){
 export function binoDirDelete(path:string){
     return fs.rmdirSync(path);
 }
-export function binoDirContents(path:string){
-    return fs.readdirSync(path, { recursive: true });
+export function binoDirContents(
+  path: string,
+  options?: Parameters<typeof fs.readdirSync>[1]
+) {
+  return fs.readdirSync(path, options);
 }
 export function binoRename(o:string, n:string){
     return fs.renameSync(o, n);
