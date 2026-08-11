@@ -7,5 +7,5 @@ export const structureUsrDocuments = "/usr/documents/";
 export const structureUsrMedia = "/usr/media/";
 export const libJSONloc = "/cache/lib.json";
 export const usrSettingsLoc = "/usr/settings.json";
-export const sysPackages = ["com.krambo345.terminal", "com.krambo345.desktop"];
-export const startUpPackages = ["com.krambo345.desktop", "com.krambo345.wer"]
+export const sysPackages = ["com.krambo345.wer", "com.krambo345.terminal",  "com.krambo345.desktop"];
+export const startUpPackages = ["com.krambo345.wer", "com.krambo345.desktop"]

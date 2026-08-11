@@ -15,11 +15,11 @@ export async function bootstrapPackageGet() {
 export async function bootstrapPackageLaunch() {
   await kernel.system.log("Launching system packages");
   for (const pckg of variables.startUpPackages) {
-    const launched = await kernel.packer.start(pckg)
-    if (launched) {
-      await kernel.system.log(`Got ${pckg}`, "success");
+    const started = await kernel.packer.start(pckg)
+    if (started) {
+      await kernel.system.log(`Started ${pckg}`, "success");
     } else {
-      await kernel.system.log(`Failed to get ${pckg}`, "error");
+      await kernel.system.log(`Failed to start ${pckg}`, "error");
     }
   }
 }

@@ -163,7 +163,6 @@ export async function packageLaunch(pckg: string, visiting: Set<string> = new Se
       console.error(`Failed to load commands for package "${pckg}":`, error);
     }
   }
-
   return Boolean(result ?? true);
 }
 
