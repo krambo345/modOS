@@ -1,4 +1,4 @@
-import { firestorePackagesGet, firestorePackageInstall, firestoreUserData } from "@kernel/firebase/firestore";
+import { firestorePackagesGet, firestorePackageInstall } from "@kernel/firebase/firestore";
 import { kernel } from "@kernel/api";
 import * as variables from "@kernel/shared/variables";
 import * as types from "@kernel/shared/types";
@@ -61,18 +61,29 @@ export function packageIsInstalled(pckg: string) {
   return kernel.bino.file.check(packagePath(pckg));
 }
 
-export function packageRunningList() {
-  return Array.from(packageRunning.keys());
-}
-
-export async function packageInstall(pckg: string) {
+export async function packageInstall(pckg: string, visiting: Set<string> = new Set()): Promise<boolean> {
   if (packageIsInstalled(pckg)) {
     return true;
   }
 
+  if (visiting.has(pckg)) {
+    return false;
+  }
+  visiting.add(pckg);
+
   const record = await firestorePackageInstall(pckg);
   if (!record || typeof (record as { file?: unknown }).file !== "string") {
     return false;
+  }
+
+  const dependencies = Array.isArray((record as { dependencies?: unknown }).dependencies)
+    ? (record as { dependencies: string[] }).dependencies
+    : [];
+
+  for (const dep of dependencies) {
+    if (!packageIsInstalled(dep)) {
+      await packageInstall(dep, visiting);
+    }
   }
 
   const file = (record as { file: string }).file;
@@ -120,9 +131,6 @@ export async function packageLaunch(pckg: string, visiting: Set<string> = new Se
 
   for (const dep of dependencies) {
     if (packageRunning.has(dep)) continue;
-    if (!packageIsInstalled(dep)) {
-      await packageInstall(dep);
-    }
     await packageLaunch(dep, visiting);
   }
 
@@ -174,30 +182,6 @@ export async function packageKill(pckg: string) {
     commandCache.delete(pckg);
   }
   return true;
-}
-
-export async function packerLibText(col: string) {
-  return (await packerLibJSON(col)).toString();
-}
-
-export async function packerLibJSON(col: string) {
-  return await firestorePackagesGet(col);
-}
-
-export async function packerPackagesInstall(pckg: string) {
-  return await firestorePackageInstall(pckg);
-}
-
-export async function packerUserData() {
-  return await firestoreUserData();
-}
-
-export async function packerpackageLaunch(pckg: string) {
-  return await packageLaunch(pckg);
-}
-
-export async function packerpackageKill(pckg: string) {
-  return await packageKill(pckg);
 }
 
 export async function packageCommands(): Promise<

@@ -109,13 +109,13 @@ export const kernel = {
     async fetch() {
       return await packer.packageList();
     },
-    check(pckg: string) {
+    async check(pckg: string) {
       return packer.packageIsInstalled(pckg);
     },
     async get(pckg: string) {
       return await packer.packageInstall(pckg);
     },
-    remove(pckg: string) {
+    async remove(pckg: string) {
       return packer.packageUninstall(pckg);
     },
     async start(pckg: string) {
