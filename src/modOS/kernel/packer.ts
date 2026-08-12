@@ -2,7 +2,6 @@ import { firestorePackagesGet, firestorePackageInstall } from "@kernel/firebase/
 import { kernel } from "@kernel/api";
 import * as variables from "@kernel/shared/variables";
 import * as types from "@kernel/shared/types";
-import { prodErrorMap } from "firebase/auth";
 
 type packageModule = {
   app?: () => unknown;
