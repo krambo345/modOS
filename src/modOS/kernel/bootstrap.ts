@@ -15,6 +15,7 @@ export async function bootstrap() {
   await kernel.system.log(`Booting ${variables.osName} ${variables.osVersion}`);
   await bootstrapDisplayToggle(manifest, display, "manifest");
     await bootstrapAccountForm();
+    manifest.innerHTML = ``
   if (!(await kernel.account.ensureUserData())) {
     await kernel.system.log("Failed to retrieve or create user data.", "error");
   } else {
@@ -47,8 +48,12 @@ export async function bootstrap() {
     await bootstrapPackageLaunch();
 }
 catch(error){
-  kernel.system.log(error, "error")
-  return false
+  await kernel.system.log(error, "error");
+  await kernel.terminal.launch(manifest);
+  manifest.style.overflowY = "scroll";
+  manifest.scrollTop = manifest.scrollHeight;
+  kernel.system.log(`Entered modOS rescue mode; scrolling has been unlocked. Crash reason: ${error}`, "warn");
+  return false;
 }
   await kernel.system.log(
     `Bootstrap complete, welcome to ${variables.osName} ${variables.osVersion}!`,

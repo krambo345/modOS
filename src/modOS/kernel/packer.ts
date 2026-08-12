@@ -2,6 +2,7 @@ import { firestorePackagesGet, firestorePackageInstall } from "@kernel/firebase/
 import { kernel } from "@kernel/api";
 import * as variables from "@kernel/shared/variables";
 import * as types from "@kernel/shared/types";
+import { prodErrorMap } from "firebase/auth";
 
 type packageModule = {
   app?: () => unknown;
@@ -62,10 +63,7 @@ export function packageIsInstalled(pckg: string) {
 }
 
 export async function packageInstall(pckg: string, visiting: Set<string> = new Set()): Promise<boolean> {
-  if (packageIsInstalled(pckg)) {
-    return true;
-  }
-
+  
   if (visiting.has(pckg)) {
     return false;
   }
@@ -82,7 +80,10 @@ export async function packageInstall(pckg: string, visiting: Set<string> = new S
 
   for (const dep of dependencies) {
     if (!packageIsInstalled(dep)) {
-      await packageInstall(dep, visiting);
+      const installed = await packageInstall(dep, visiting);
+      if (!installed){
+        throw Error(`Failed to install dependancy ${dep}`);
+      }
     }
   }
 

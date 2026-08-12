@@ -22,7 +22,7 @@ export const kernel = {
   },
   bino: {
     file: {
-      write(path: string, data: string) {
+      write(path: string, data: any) {
         if (path == undefined) {
           return String("Path not specified")
         }
