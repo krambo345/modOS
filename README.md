@@ -1,1 +1,1 @@
-Bound to be made
+THIS IS THE NEWER modOS. IF YOU ARE HERE FOR the webOS 1 SUBMISSION, PLEASE VISIT https://github.com/krambo345/modOS-pre INSTEAD. 
