@@ -1,5 +1,5 @@
 export const osName = "modOS Sevda Çiçeği";
-export const osVersion = "v1.0.0-beta";
+export const osVersion = "v1.0.4-beta";
 export const structureCache = "/cache/";
 export const structurePackages = "/packages/"
 export const structureUsr = "/usr/";
@@ -8,5 +8,5 @@ export const structureUsrMedia = "/usr/media/";
 export const libJSONloc = "/cache/lib.json";
 export const libTXTloc = "/cache/lib.txt"
 export const usrSettingsLoc = "/usr/settings.json";
-export const sysPackages = ["com.krambo345.wer", "com.krambo345.bartender", "com.krambo345.terminal",  "com.krambo345.desktop"];
+export const sysPackages = ["com.krambo345.wer", "com.krambo345.bartender", "com.krambo345.ranger", "com.krambo345.editor", "com.krambo345.terminal",  "com.krambo345.desktop"];
 export const startUpPackages = ["com.krambo345.wer", "com.krambo345.bartender", "com.krambo345.desktop"]

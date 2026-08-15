@@ -5,7 +5,7 @@ let systemSoundBlockade = false;
 export async function systemSound(sound: string, times?: number) {
   if (!systemSoundBlockade) {
     try {
-      const url = `media/${sound}.mp3`;
+      const url = `${import.meta.env.BASE_URL}media/${sound}.mp3`;
       const player = new Audio(url);
       player.loop = false;
       const repeats = times ?? 1;
