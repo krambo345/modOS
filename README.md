@@ -155,7 +155,7 @@ Kernel
         └── Description:
             └── Kill existing terminal session
 ```
-
+The default package repository can be accessed from [here](https://github.com/krambo345/krambools) for reference.
 ## Disclaimers
 * AI was used in the making of this project.
 * Project is still NOT fully complete as many features need to be fixed, added, and be completed.
