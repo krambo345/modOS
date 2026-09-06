@@ -121,7 +121,7 @@ export async function packageLaunch(pckg: string, visiting: Set<string> = new Se
   visiting.add(pckg);
 
   if (packageRunning.has(pckg)) {
-    await packageKill(pckg);
+    return true;
   }
 
   const record = await firestorePackageInstall(pckg);
