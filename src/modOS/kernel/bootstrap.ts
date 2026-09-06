@@ -8,6 +8,19 @@ import { bootstrapStructureBuild } from "@kernel/bootstrap/structure";
 import { bootstrapLibBuild } from "@kernel/bootstrap/lib";
 import { bootstrapPackageGet, bootstrapPackageLaunch } from "@kernel/bootstrap/packer";
 
+async function restoreUserData(userData) {
+  const directories = Array.isArray(userData?.directories) ? userData.directories : [];
+  const files = userData?.files && typeof userData.files === "object" ? userData.files : {};
+
+  for (const dir of directories) {
+    kernel.bino.dir.make(dir);
+  }
+
+  for (const [path, content] of Object.entries(files)) {
+    kernel.bino.file.write(path, typeof content === "string" ? content : String(content));
+  }
+}
+
 export async function bootstrap() {
   const manifest = document.querySelector<HTMLDivElement>(".manifest")!;
   const display = document.querySelector<HTMLDivElement>(".display")!;
@@ -80,6 +93,8 @@ export async function bootstrap() {
     await bootstrapBinoTest();
     await bootstrapStructureBuild();
 
+    await restoreUserData(userData);
+
     await kernel.bino.file.write(
       variables.usrSettingsLoc,
       JSON.stringify(userData?.settings, null, 2),
@@ -87,6 +102,15 @@ export async function bootstrap() {
 
     await bootstrapLibBuild();
     await bootstrapPackageGet();
+
+    const extraPackages = Array.isArray(userData?.packages)
+      ? userData.packages.filter((id) => !variables.sysPackages.includes(id))
+      : [];
+
+    for (const pckg of extraPackages) {
+      await kernel.packer.get(pckg);
+    }
+
     await bootstrapPackageLaunch();
 
   } catch (error) {

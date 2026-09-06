@@ -65,6 +65,19 @@ export const kernel = {
         }
 
         return false;
+      },
+
+      rename(path: string, newPath: string) {
+        if (path == undefined || newPath == undefined) {
+          return String("Path not specified");
+        }
+
+        if (bino.binoCheck(path)) {
+          bino.binoRename(path, newPath);
+          return true;
+        }
+
+        return false;
       }
     },
 
@@ -105,6 +118,19 @@ export const kernel = {
         }
 
         return false;
+      },
+
+      rename(path: string, newPath: string) {
+        if (path == undefined || newPath == undefined) {
+          return String("Path not specified");
+        }
+
+        if (bino.binoCheck(path)) {
+          bino.binoRename(path, newPath);
+          return true;
+        }
+
+        return false;
       }
     }
   },
@@ -122,8 +148,15 @@ export const kernel = {
       return await auth.authGoogleAccountManager();
     },
 
-    async sessionUID() {
-      return await auth.authSessionUID();
+    async sessionUID() { return await auth.authSessionUID();
+    },
+
+    async signOut() {
+      return await auth.authSignOut();
+    },
+
+    async linkGoogle(password: string) {
+      return await auth.authLinkGoogleWithPassword(password);
     },
 
     async ensureUserData() {

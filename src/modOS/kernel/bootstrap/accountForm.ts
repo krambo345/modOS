@@ -68,6 +68,16 @@ export async function bootstrapAccountForm(): Promise<{
             </span>
         </p>
 
+        <div class="modos-account__link-notice" style="display:none;">
+            <p>An account already exists for <span class="modos-account__link-email"></span>. Enter your password above and click Link to connect Google sign-in to that account.</p>
+            <button
+                type="button"
+                class="account-link"
+            >
+                Link Account
+            </button>
+        </div>
+
     </div>
 </div>
         `;
@@ -75,6 +85,9 @@ export async function bootstrapAccountForm(): Promise<{
     const submit = manifest.querySelector<HTMLButtonElement>(".account-submit")!;
     const guest = manifest.querySelector<HTMLButtonElement>(".account-guest")!;
     const google = manifest.querySelector<HTMLSpanElement>(".modos-account__link")!;
+    const linkNotice = manifest.querySelector<HTMLDivElement>(".modos-account__link-notice")!;
+    const linkEmail = manifest.querySelector<HTMLSpanElement>(".modos-account__link-email")!;
+    const link = manifest.querySelector<HTMLButtonElement>(".account-link")!;
 
     submit.addEventListener("click", async () => {
       const action = (
@@ -96,14 +109,37 @@ export async function bootstrapAccountForm(): Promise<{
       }
     });
     guest.addEventListener("click", async () => {
+      try {
+        await kernel.account.signOut();
+      } catch (err) {
+        await kernel.system.log(`Guest sign-out error: ${err}`, "warn");
+      }
       resolve({ action: "guest" });
     });
     google.addEventListener("click", async () => {
       try {
         await kernel.account.manageWithGoogle();
         resolve({ action: "google", email: "", password: "" });
+      } catch (err: any) {
+        if (err?.code === "modos/link-required") {
+          linkEmail.textContent = err.email ?? "";
+          linkNotice.style.display = "block";
+          (manifest.querySelector(".modos-account__field-password") as HTMLInputElement)?.focus();
+        } else {
+          await kernel.system.log(`Google sign-in error: ${err}`, "error");
+        }
+      }
+    });
+    link.addEventListener("click", async () => {
+      const password = (
+        manifest.querySelector(".modos-account__field-password") as HTMLInputElement
+      ).value;
+
+      try {
+        await kernel.account.linkGoogle(password);
+        resolve({ action: "google", email: "", password: "" });
       } catch (err) {
-        await kernel.system.log(`Google sign-in error: ${err}`, "error");
+        await kernel.system.log(`Account link error: ${err}`, "error");
       }
     });
   });
