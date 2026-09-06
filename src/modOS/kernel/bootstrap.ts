@@ -7,8 +7,9 @@ import { bootstrapBinoTest } from "@kernel/bootstrap/binoTest";
 import { bootstrapStructureBuild } from "@kernel/bootstrap/structure";
 import { bootstrapLibBuild } from "@kernel/bootstrap/lib";
 import { bootstrapPackageGet, bootstrapPackageLaunch } from "@kernel/bootstrap/packer";
+import type { UserData } from "@kernel/firebase/firestore";
 
-async function restoreUserData(userData) {
+async function restoreUserData(userData: UserData | null | undefined) {
   const directories = Array.isArray(userData?.directories) ? userData.directories : [];
   const files = userData?.files && typeof userData.files === "object" ? userData.files : {};
 
